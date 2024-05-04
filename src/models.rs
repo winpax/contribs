@@ -2,38 +2,47 @@ use serde::{Deserialize, Serialize};
 
 pub type Collaborators = Vec<Collaborator>;
 
-#[derive(Debug, Serialize, Deserialize)]
+/// Collaborator
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Collaborator {
-    login: String,
-    id: i64,
-    node_id: String,
-    avatar_url: String,
-    gravatar_id: String,
-    url: String,
-    html_url: String,
-    followers_url: String,
-    following_url: String,
-    gists_url: String,
-    starred_url: String,
-    subscriptions_url: String,
-    organizations_url: String,
-    repos_url: String,
-    events_url: String,
-    received_events_url: String,
+    pub avatar_url: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub email: Option<String>,
+    pub events_url: String,
+    pub followers_url: String,
+    pub following_url: String,
+    pub gists_url: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub gravatar_id: Option<String>,
+    pub html_url: String,
+    pub id: i64,
+    pub login: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    pub node_id: String,
+    pub organizations_url: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub permissions: Option<Permissions>,
+    pub received_events_url: String,
+    pub repos_url: String,
+    pub role_name: String,
+    pub site_admin: bool,
+    pub starred_url: String,
+    pub subscriptions_url: String,
     #[serde(rename = "type")]
-    collaborator_type: String,
-    site_admin: bool,
-    permissions: Permissions,
-    role_name: String,
+    pub collaborator_type: String,
+    pub url: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Permissions {
-    pull: bool,
-    triage: bool,
-    push: bool,
-    maintain: bool,
-    admin: bool,
+    pub admin: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub maintain: Option<bool>,
+    pub pull: bool,
+    pub push: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub triage: Option<bool>,
 }
 
 #[cfg(test)]
