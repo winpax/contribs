@@ -1,4 +1,5 @@
 use models::Collaborators;
+use reqwest::header::USER_AGENT;
 
 pub mod models;
 
@@ -53,6 +54,10 @@ impl std::future::IntoFuture for Contributors {
                     "https://api.github.com/repos/{owner}/{repo}/collaborators",
                 ))
                 .bearer_auth(self.api_key)
+                .header(
+                    USER_AGENT,
+                    "contribs library for Rust. Finds contributors to a GitHub repository.",
+                )
                 .header(ACCEPT, "application/vnd.github+json")
                 .header("X-GitHub-Api-Version", "2022-11-28")
                 .send()
