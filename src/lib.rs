@@ -1,3 +1,5 @@
+use models::Collaborators;
+
 pub mod models;
 
 #[derive(Debug, thiserror::Error)]
@@ -35,23 +37,30 @@ impl Contributors {
 }
 
 impl std::future::IntoFuture for Contributors {
-    type Output = reqwest::Result<reqwest::Response>;
+    type Output = reqwest::Result<Collaborators>;
 
     type IntoFuture = futures_core::future::BoxFuture<'static, Self::Output>;
 
     fn into_future(self) -> Self::IntoFuture {
         use reqwest::header::ACCEPT;
 
-        let request = reqwest::Client::new()
-            .get(format!(
-                "https://api.github.com/repos/{}/{}/collaborators",
-                self.owner, self.repo
-            ))
-            .bearer_auth(self.api_key)
-            .header(ACCEPT, "application/vnd.github+json")
-            .header("X-GitHub-Api-Version", "2022-11-28")
-            .send();
+        let owner = self.owner.clone();
+        let repo = self.repo.clone();
 
-        Box::pin(request)
+        let request = || async move {
+            let response = reqwest::Client::new()
+                .get(format!(
+                    "https://api.github.com/repos/{owner}/{repo}/collaborators",
+                ))
+                .bearer_auth(self.api_key)
+                .header(ACCEPT, "application/vnd.github+json")
+                .header("X-GitHub-Api-Version", "2022-11-28")
+                .send()
+                .await?;
+
+            response.json().await
+        };
+
+        Box::pin(request())
     }
 }
